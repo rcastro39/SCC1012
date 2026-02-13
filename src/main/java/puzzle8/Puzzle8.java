@@ -1,4 +1,4 @@
-package busquedas;
+package puzzle8;
 
 import java.util.ArrayList;
 
