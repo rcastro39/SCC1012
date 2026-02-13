@@ -1,5 +1,3 @@
-package arbolbinario;
-
 public class Arbol<T> {
     private Nodo<T> raiz;
 

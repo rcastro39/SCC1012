@@ -1,3 +1,0 @@
-- [Árbol binario](./src/main/java/arbolbinario/App.java)
-- [Resumen de la historia de la IA](./otros/Resumen%20de%20la%20historia%20de%20la%20IA.pdf)
-- [8Puzzle](./src/main/java/puzzle8/Puzzle8.java)

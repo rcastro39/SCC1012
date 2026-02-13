@@ -1,5 +1,3 @@
-package arbolbinario;
-
 public class Nodo<T>  {
     private Nodo<T> izquierdo;
     private Nodo<T> derecho;

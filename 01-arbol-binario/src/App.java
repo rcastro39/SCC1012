@@ -1,5 +1,3 @@
-import arbolbinario.Arbol;
-
 void main() {
     var arbol = new Arbol<String>();
     arbol.insertar("Hola");
