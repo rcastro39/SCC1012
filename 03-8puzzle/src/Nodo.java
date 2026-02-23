@@ -59,7 +59,7 @@ public class Nodo {
     public void imprimirCamino() {
         var stack = new Stack<Nodo>();
         var actual = this;
-        while (actual.padre != null) {
+        while (actual != null) {
             stack.push(actual);
             actual = actual.padre;
         }

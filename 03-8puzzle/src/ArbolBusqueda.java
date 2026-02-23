@@ -2,9 +2,29 @@ import java.util.*;
 
 public class ArbolBusqueda {
     private Nodo raiz;
+    private Heuristica heuristica = new Heuristica() {
+        @Override
+        public boolean equals(String a, String b) {
+            return a.equals(b);
+        }
+
+        @Override
+        public int calcularDiferencia(String a, String b) {
+            var diferencias = 0;
+            for (var i = 0; i < a.length(); i++) {
+                if (a.charAt(i) != b.charAt(i)) diferencias++;
+            }
+            return diferencias;
+        }
+    };
 
     public ArbolBusqueda(Nodo raiz) {
         this.raiz = raiz;
+    }
+
+    public ArbolBusqueda usarHeuristica(Heuristica heuristica) {
+        this.heuristica = heuristica;
+        return this;
     }
 
     public Nodo breadthFirstSearch(String estadoObjetivo) {
@@ -17,7 +37,7 @@ public class ArbolBusqueda {
         Nodo actual;
         while (!cola.isEmpty()) {
             actual = cola.poll();
-            if (actual.getEstado().equals(estadoObjetivo)) {
+            if (heuristica.equals(actual.getEstado(), estadoObjetivo)) {
                 return actual;
             }
 
@@ -41,7 +61,7 @@ public class ArbolBusqueda {
         Nodo actual;
         while (!stack.isEmpty()) {
             actual = stack.pop();
-            if (actual.getEstado().equals(estadoObjetivo)) {
+            if (heuristica.equals(actual.getEstado(), estadoObjetivo)) {
                 return actual;
             }
 
@@ -66,7 +86,7 @@ public class ArbolBusqueda {
         raiz.setCosto(0);
 
         Nodo actual = raiz;
-        while (!actual.getEstado().equals(estadoObjetivo)) {
+        while (actual != null && !heuristica.equals(actual.getEstado(), estadoObjetivo)) {
             stateSets.add(actual.getEstado());
 
             var sucesores = actual.generarSucesores();
@@ -74,7 +94,7 @@ public class ArbolBusqueda {
                 if (stateSets.contains(sucesor.getEstado())) continue;
                 stateSets.add(sucesor.getEstado());
 
-                sucesor.setCostoTotal(actual.getCostoTotal() + (int)sucesor.getEstado().charAt(sucesor.getEstado().indexOf(' ')));
+                sucesor.setCostoTotal(actual.getCostoTotal() + Character.getNumericValue(sucesor.getEstado().charAt(actual.getEstado().indexOf(' '))));
                 priorityQueue.add(sucesor);
             }
 
@@ -82,7 +102,7 @@ public class ArbolBusqueda {
             tiempo++;
         }
 
-        return null;
+        return actual;
     }
 
     public Nodo limitedDepthFirstSearch(String estadoObjetivo, int limiteDeProfundidad) {
@@ -95,14 +115,16 @@ public class ArbolBusqueda {
         Nodo actual;
         while (!stack.isEmpty()) {
             actual = stack.pop();
-            if (actual.getEstado().equals(estadoObjetivo)) {
+            if (heuristica.equals(actual.getEstado(), estadoObjetivo)) {
                 return actual;
             }
 
+            if (actual.getNivel() > limiteDeProfundidad) continue;
+
             visitados.add(actual.getEstado());
             for (Nodo sucesor : actual.generarSucesores().reversed()) {
+                if (sucesor.getNivel() > limiteDeProfundidad) break;
                 if (visitados.contains(sucesor.getEstado())) continue;
-                if (limiteDeProfundidad-- == 0) return null;
                 stack.push(sucesor);
             }
         }
