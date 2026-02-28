@@ -1,3 +1,8 @@
+package puzzle;
+
+import puzzle.utils.Heuristica;
+import puzzle.utils.NodePriorityComparator;
+
 import java.util.*;
 
 public class ArbolBusqueda {

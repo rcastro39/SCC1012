@@ -1,3 +1,7 @@
+package puzzle.utils;
+
+import puzzle.Nodo;
+
 import java.util.Comparator;
 
 public class NodePriorityComparator implements Comparator<Nodo> {

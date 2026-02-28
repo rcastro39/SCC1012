@@ -1,3 +1,7 @@
+import puzzle.ArbolBusqueda;
+import puzzle.Nodo;
+import puzzle.utils.Heuristica;
+
 void main() {
     var raiz = new Nodo("5674 8321", null, 1);
     var estadoObjetivo = "1238 4765";
