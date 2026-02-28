@@ -12,10 +12,12 @@ public class Nodo<T extends GeneradorSucesores<T>> {
     private Nodo<T> padre;
     private int nivel;
     private int costo;
+    private int costoTotal = -1;
 
     public Nodo(T estado, Nodo<T> padre, int costo) {
         this.estado = estado;
         this.padre = padre;
+        if (costo < 0) throw new IllegalArgumentException("Costo no puede ser -1");
         this.costo = costo;
         this.nivel = padre == null ? 1 : padre.getNivel() + 1;
     }
@@ -50,6 +52,7 @@ public class Nodo<T extends GeneradorSucesores<T>> {
 
     public void setPadre(Nodo<T> padre) {
         this.padre = padre;
+        this.costoTotal = -1;
     }
 
     public int getNivel() {
@@ -65,13 +68,15 @@ public class Nodo<T extends GeneradorSucesores<T>> {
     }
 
     public int getCostoTotal() {
-        int total = costo;
+        if (costoTotal > -1) return costoTotal;
+
+        costoTotal = costo;
         Nodo<T> actual = padre;
         while (actual != null) {
-            total += actual.getCosto();
+            costoTotal += actual.getCosto();
             actual = actual.getPadre();
         }
-        return total;
+        return costoTotal;
     }
 
     @Override
