@@ -145,12 +145,12 @@ public class ArbolBusqueda<T extends GeneradorSucesores<T>> {
         resultados.put("Depth First Search", new Resultado(dfs, fin));
 
         inicio = System.nanoTime();
-        var ucs = depthFirstSearch(estadoObjetivo);
+        var ucs = uniformCostSearch(estadoObjetivo);
         fin = System.nanoTime() - inicio;
         resultados.put("Uniform Cost Search", new Resultado(ucs, fin));
 
         inicio = System.nanoTime();
-        var idfs = depthFirstSearch(estadoObjetivo);
+        var idfs = iterativeDepthFirstSearch(estadoObjetivo);
         fin = System.nanoTime() - inicio;
         resultados.put("Iterative Depth First Search", new Resultado(idfs, fin));
 
