@@ -1,6 +1,5 @@
 package puzzle.utils;
 
-public interface Heuristica {
-    boolean equals(String a, String b);
-    int calcularDiferencia(String a, String b);
+public interface Heuristica<T> {
+    boolean equals(T a, T b);
 }

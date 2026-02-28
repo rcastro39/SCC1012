@@ -4,7 +4,7 @@ import puzzle.Nodo;
 
 import java.util.Comparator;
 
-public class NodePriorityComparator implements Comparator<Nodo> {
+public class NodePriorityComparator<T extends GeneradorSucesores<T>> implements Comparator<Nodo<T>> {
 
     @Override
     public int compare(Nodo x, Nodo y) {

@@ -1,36 +1,55 @@
 package puzzle;
 
+import puzzle.utils.GeneradorSucesores;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-public class Nodo {
-    private String estado;
-    private Nodo padre;
+public class Nodo<T extends GeneradorSucesores<T>> {
+    private T estado;
+    private Nodo<T> padre;
     private int nivel;
     private int costo;
-    private int costoTotal;
 
-    public Nodo(String estado, Nodo padre, int nivel) {
+    public Nodo(T estado, Nodo<T> padre, int costo) {
         this.estado = estado;
         this.padre = padre;
-        this.nivel = nivel;
+        this.costo = costo;
+        this.nivel = padre == null ? 1 : padre.getNivel() + 1;
     }
 
-    public List<Nodo> generarSucesores() {
-        var estadosHijos = Puzzle8.generarSucesores(estado);
-        return Arrays.stream(estadosHijos)
-            .map(estado -> new Nodo(estado, this, nivel + 1))
-            .collect(Collectors.toList());
+    public Nodo(T estado, Nodo<T> padre) {
+        this(estado, padre, 0);
     }
 
-    public String getEstado() {
+
+    public Nodo(T estado, int costo) {
+        this(estado, null, costo);
+    }
+    public Nodo(T estado) {
+        this(estado, null);
+    }
+
+    public List<Nodo<T>> generarSucesores() {
+        final var sucesores = estado.generarSucesores();
+        for (Nodo<T> sucesor : sucesores) {
+            sucesor.setPadre(this);
+        }
+        return sucesores;
+    }
+
+    public T getEstado() {
         return estado;
     }
 
-    public Nodo getPadre() {
+    public Nodo<T> getPadre() {
         return padre;
+    }
+
+    public void setPadre(Nodo<T> padre) {
+        this.padre = padre;
     }
 
     public int getNivel() {
@@ -46,16 +65,24 @@ public class Nodo {
     }
 
     public int getCostoTotal() {
-        return costoTotal;
-    }
-
-    public void setCostoTotal(int costoTotal) {
-        this.costoTotal = costoTotal;
+        int total = costo;
+        Nodo<T> actual = padre;
+        while (actual != null) {
+            total += actual.getCosto();
+            actual = actual.getPadre();
+        }
+        return total;
     }
 
     @Override
     public String toString() {
-        return String.format("%s\n%s\n%s", estado.substring(0, 3), estado.substring(3, 6), estado.substring(6));
+        return estado.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (estado.getClass() != obj.getClass()) return false;
+        return estado.equals(obj);
     }
 
     public void imprimirCamino() {

@@ -1,45 +1,31 @@
 package puzzle;
 
+import puzzle.utils.GeneradorSucesores;
 import puzzle.utils.Heuristica;
 import puzzle.utils.NodePriorityComparator;
 
 import java.util.*;
 
-public class ArbolBusqueda {
-    private Nodo raiz;
-    private Heuristica heuristica = new Heuristica() {
-        @Override
-        public boolean equals(String a, String b) {
-            return a.equals(b);
-        }
+public class ArbolBusqueda<T extends GeneradorSucesores<T>> {
+    private final Nodo<T> raiz;
+    private Heuristica<T> heuristica = Object::equals;
 
-        @Override
-        public int calcularDiferencia(String a, String b) {
-            var diferencias = 0;
-            for (var i = 0; i < a.length(); i++) {
-                if (a.charAt(i) != b.charAt(i)) diferencias++;
-            }
-            return diferencias;
-        }
-    };
-
-    public ArbolBusqueda(Nodo raiz) {
-        this.raiz = raiz;
+    public ArbolBusqueda(T raiz) {
+        if (raiz == null) throw new IllegalArgumentException("raiz no puede ser nula");
+        this.raiz = new Nodo<T>(raiz);
     }
 
-    public ArbolBusqueda usarHeuristica(Heuristica heuristica) {
+    public ArbolBusqueda<T> usarHeuristica(Heuristica<T> heuristica) {
         this.heuristica = heuristica;
         return this;
     }
 
-    public Nodo breadthFirstSearch(String estadoObjetivo) {
-        if (raiz == null) return null;
-
-        var visitados = new HashSet<String>();
-        var cola = new LinkedList<Nodo>();
+    public Nodo<T> breadthFirstSearch(T estadoObjetivo) {
+        var visitados = new HashSet<T>();
+        var cola = new LinkedList<Nodo<T>>();
         cola.add(raiz);
 
-        Nodo actual;
+        Nodo<T> actual;
         while (!cola.isEmpty()) {
             actual = cola.poll();
             if (heuristica.equals(actual.getEstado(), estadoObjetivo)) {
@@ -47,7 +33,7 @@ public class ArbolBusqueda {
             }
 
             visitados.add(actual.getEstado());
-            for (Nodo sucesor : actual.generarSucesores()) {
+            for (Nodo<T> sucesor : actual.generarSucesores()) {
                 if (visitados.contains(sucesor.getEstado())) continue;
                 cola.add(sucesor);
             }
@@ -56,14 +42,12 @@ public class ArbolBusqueda {
         return null;
     }
 
-    public Nodo depthFirstSearch(String estadoObjetivo) {
-        if (raiz == null) return null;
-
-        var visitados = new HashSet<String>();
-        var stack = new Stack<Nodo>();
+    public Nodo<T> depthFirstSearch(T estadoObjetivo) {
+        var visitados = new HashSet<T>();
+        var stack = new Stack<Nodo<T>>();
         stack.add(raiz);
 
-        Nodo actual;
+        Nodo<T> actual;
         while (!stack.isEmpty()) {
             actual = stack.pop();
             if (heuristica.equals(actual.getEstado(), estadoObjetivo)) {
@@ -71,7 +55,7 @@ public class ArbolBusqueda {
             }
 
             visitados.add(actual.getEstado());
-            for (Nodo sucesor : actual.generarSucesores().reversed()) {
+            for (Nodo<T> sucesor : actual.generarSucesores().reversed()) {
                 if (visitados.contains(sucesor.getEstado())) continue;
                 stack.push(sucesor);
             }
@@ -80,26 +64,24 @@ public class ArbolBusqueda {
         return null;
     }
 
-    public Nodo uniformCostSearch(String estadoObjetivo) {
-        if (raiz == null) return null;
-
-        Set<String> stateSets = new HashSet<String>();
+    public Nodo<T> uniformCostSearch(T estadoObjetivo) {
+        Set<T> stateSets = new HashSet<T>();
         int tiempo = 0;
 
-        var priorityQueue = new PriorityQueue<Nodo>(10, new NodePriorityComparator());
+        var priorityQueue = new PriorityQueue<Nodo<T>>(10, new NodePriorityComparator<>());
         priorityQueue.add(raiz);
         raiz.setCosto(0);
 
-        Nodo actual = raiz;
+        Nodo<T> actual = raiz;
         while (actual != null && !heuristica.equals(actual.getEstado(), estadoObjetivo)) {
             stateSets.add(actual.getEstado());
 
             var sucesores = actual.generarSucesores();
-            for (Nodo sucesor : sucesores) {
+            for (Nodo<T> sucesor : sucesores) {
                 if (stateSets.contains(sucesor.getEstado())) continue;
                 stateSets.add(sucesor.getEstado());
 
-                sucesor.setCostoTotal(actual.getCostoTotal() + Character.getNumericValue(sucesor.getEstado().charAt(actual.getEstado().indexOf(' '))));
+                //sucesor.setCosto();
                 priorityQueue.add(sucesor);
             }
 
@@ -110,14 +92,12 @@ public class ArbolBusqueda {
         return actual;
     }
 
-    public Nodo limitedDepthFirstSearch(String estadoObjetivo, int limiteDeProfundidad) {
-        if (raiz == null) return null;
-
-        var visitados = new HashSet<String>();
-        var stack = new Stack<Nodo>();
+    public Nodo<T> limitedDepthFirstSearch(T estadoObjetivo, int limiteDeProfundidad) {
+        var visitados = new HashSet<T>();
+        var stack = new Stack<Nodo<T>>();
         stack.add(raiz);
 
-        Nodo actual;
+        Nodo<T> actual;
         while (!stack.isEmpty()) {
             actual = stack.pop();
             if (heuristica.equals(actual.getEstado(), estadoObjetivo)) {
@@ -127,7 +107,7 @@ public class ArbolBusqueda {
             if (actual.getNivel() > limiteDeProfundidad) continue;
 
             visitados.add(actual.getEstado());
-            for (Nodo sucesor : actual.generarSucesores().reversed()) {
+            for (Nodo<T> sucesor : actual.generarSucesores().reversed()) {
                 if (sucesor.getNivel() > limiteDeProfundidad) break;
                 if (visitados.contains(sucesor.getEstado())) continue;
                 stack.push(sucesor);
@@ -137,7 +117,7 @@ public class ArbolBusqueda {
         return null;
     }
 
-    public Nodo iterativeDepthFirstSearch(String estadoObjetivo) {
+    public Nodo<T> iterativeDepthFirstSearch(T estadoObjetivo) {
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             var actual = limitedDepthFirstSearch(estadoObjetivo, i);
             if (actual != null) {
@@ -146,5 +126,57 @@ public class ArbolBusqueda {
         }
 
         return null;
+    }
+
+    public Map<String, Resultado> realizarPruebasRendimiento(T estadoObjetivo) {
+        var resultados = new HashMap<String, Resultado>();
+
+        long inicio;
+        long fin;
+
+        inicio = System.nanoTime();
+        var bfs = breadthFirstSearch(estadoObjetivo);
+        fin = System.nanoTime() - inicio;
+        resultados.put("Breadth First Search", new Resultado(bfs, fin));
+
+        inicio = System.nanoTime();
+        var dfs = depthFirstSearch(estadoObjetivo);
+        fin = System.nanoTime() - inicio;
+        resultados.put("Depth First Search", new Resultado(dfs, fin));
+
+        inicio = System.nanoTime();
+        var ucs = depthFirstSearch(estadoObjetivo);
+        fin = System.nanoTime() - inicio;
+        resultados.put("Uniform Cost Search", new Resultado(ucs, fin));
+
+        inicio = System.nanoTime();
+        var idfs = depthFirstSearch(estadoObjetivo);
+        fin = System.nanoTime() - inicio;
+        resultados.put("Iterative Depth First Search", new Resultado(idfs, fin));
+
+        return resultados;
+    }
+
+    public class Resultado {
+        private final Nodo<T> nodoResultado;
+        private final float tiempoSegundos;
+
+        protected Resultado(Nodo<T> nodoResultado, long tiempoNanosegundos) {
+            this.nodoResultado = nodoResultado;
+            this.tiempoSegundos = tiempoNanosegundos / 1_000_000_000.0f;
+        }
+
+        public Nodo<T> getNodoResultado() {
+            return nodoResultado;
+        }
+
+        public float getTiempoSegundos() {
+            return tiempoSegundos;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s - %.2f", nodoResultado.toString(), tiempoSegundos);
+        }
     }
 }
