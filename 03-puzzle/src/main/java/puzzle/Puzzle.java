@@ -30,85 +30,40 @@ public class Puzzle implements GeneradorSucesores<Puzzle> {
         final var i = estado.indexOf(indicadorVacio);
         final var estadoActual = estado;
 
-        // Esquina superior izquierda
-        if (i == 0) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, 1),
-                    intercambiarCaracteres(estadoActual, i, size)
-            );
+        var arriba = i - size;
+        var abajo = i + size;
+
+        var sucesores = new ArrayList<String>();
+
+        if (arriba >= 0) {
+            sucesores.add(intercambiarCaracteres(estadoActual, i, arriba));
         }
 
-        // Esquina superior derecha
-        if (i == size - 1) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, size - 2),
-                    intercambiarCaracteres(estadoActual, i, (size * 2) - 1)
-            );
+        if (abajo < estadoActual.length()) {
+            sucesores.add(intercambiarCaracteres(estadoActual, i, abajo));
         }
 
-        // Esquina inferior izquierda
-        if (i == (size * (size - 1))) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, (size * (size - 2))),
-                    intercambiarCaracteres(estadoActual, i, (size * (size - 1) + 1))
-            );
+        if (i % size != 0) {
+            sucesores.add(intercambiarCaracteres(estadoActual, i, i - 1));
         }
 
-        // Esquina inferior derecha
-        if (i == ((size * size) - 1)) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, (size * (size - 1) - 1)),
-                    intercambiarCaracteres(estadoActual, i, ((size * size) - 2))
-            );
+        if (i % size != size - 1) {
+            sucesores.add(intercambiarCaracteres(estadoActual, i, i + 1));
         }
 
-        // Lado superior
-        if (i < size) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, i - 1),
-                    intercambiarCaracteres(estadoActual, i, i + 1),
-                    intercambiarCaracteres(estadoActual, i, i + size)
-            );
-        }
-
-        // Lado izquierdo
-        if (i % size == 0) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, i - size),
-                    intercambiarCaracteres(estadoActual, i, i + 1),
-                    intercambiarCaracteres(estadoActual, i, i + size)
-            );
-        }
-
-        // Lado derecho
-        if (i % size == size - 1) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, i - size),
-                    intercambiarCaracteres(estadoActual, i, i - 1),
-                    intercambiarCaracteres(estadoActual, i, i + size)
-            );
-        }
-
-        // Lado inferior
-        if (i > (size * (size - 1))) {
-            return List.of(
-                    intercambiarCaracteres(estadoActual, i, i - 1),
-                    intercambiarCaracteres(estadoActual, i, i - size),
-                    intercambiarCaracteres(estadoActual, i, i + 1)
-            );
-        }
-
-        // Centro
-        return List.of(
-                intercambiarCaracteres(estadoActual, i, i - 1),
-                intercambiarCaracteres(estadoActual, i, i - size),
-                intercambiarCaracteres(estadoActual, i, i + 1),
-                intercambiarCaracteres(estadoActual, i, i + size)
-        );
+        return sucesores;
     }
 
     public String getEstado() {
         return estado;
+    }
+
+    public int getPosicionVacio() {
+        return estado.indexOf(indicadorVacio);
+    }
+
+    public int getSize() {
+        return size;
     }
 
     @Override

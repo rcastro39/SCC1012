@@ -12,7 +12,7 @@ public class Nodo<T extends GeneradorSucesores<T>> {
     private Nodo<T> padre;
     private int nivel;
     private int costo;
-    private int costoTotal = -1;
+    private int costoHeuristica = 0;
 
     public Nodo(T estado, Nodo<T> padre, int costo) {
         this.estado = estado;
@@ -42,6 +42,16 @@ public class Nodo<T extends GeneradorSucesores<T>> {
         return sucesores;
     }
 
+    public boolean fuePadre(Nodo<T> nodo) {
+        if (nodo.estado.equals(estado)) return true;
+        Nodo<T> actual = padre;
+        while (actual != null) {
+            if (actual.estado.equals(nodo.estado)) return true;
+            actual = actual.getPadre();
+        }
+        return false;
+    }
+
     public T getEstado() {
         return estado;
     }
@@ -52,7 +62,6 @@ public class Nodo<T extends GeneradorSucesores<T>> {
 
     public void setPadre(Nodo<T> padre) {
         this.padre = padre;
-        this.costoTotal = -1;
     }
 
     public int getNivel() {
@@ -68,15 +77,16 @@ public class Nodo<T extends GeneradorSucesores<T>> {
     }
 
     public int getCostoTotal() {
-        if (costoTotal > -1) return costoTotal;
+        var c = costo + costoHeuristica;
+        return padre == null ? c : c + padre.getCostoTotal();
+    }
 
-        costoTotal = costo;
-        Nodo<T> actual = padre;
-        while (actual != null) {
-            costoTotal += actual.getCosto();
-            actual = actual.getPadre();
-        }
-        return costoTotal;
+    public int getCostoHeuristica() {
+        return costoHeuristica;
+    }
+
+    public void setCostoHeuristica(int costoHeuristica) {
+        this.costoHeuristica = costoHeuristica;
     }
 
     @Override
