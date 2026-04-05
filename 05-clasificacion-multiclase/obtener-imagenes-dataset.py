@@ -12,7 +12,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from hashlib import sha256
 
-persona = "charlie kirk"
+persona = "will smith"
 count = 100
 
 persona_dir = f"dataset/{persona}"
